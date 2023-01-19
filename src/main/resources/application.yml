@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: deudas_prod
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+  datasource:
+    url: ${db_jdb_url}
+    username: ${db_user}
+    password: ${db_pass}
+    driverClassName: org.postgresql.Driver
+
+  sql:
+    init:
+      platform: postgres
+
+springdoc:
+  api-docs:
+    path: /swagger-ui.html
