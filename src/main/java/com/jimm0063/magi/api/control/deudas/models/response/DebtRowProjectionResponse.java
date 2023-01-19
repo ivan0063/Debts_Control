@@ -4,13 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
 @Setter @Getter
-public class UserPaymentResponse {
-    private String nickname;
-    private Integer cutOffDay;
-    private List<LocalDateTime> paymentsMade;
+public class DebtRowProjectionResponse {
+    private String cardNickname;
+    private List<DebtProjectionResponse> debtsProjection;
 }

@@ -1,13 +1,10 @@
 package com.jimm0063.magi.api.control.deudas.controller;
 
+import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.service.PaymentService;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payments")
@@ -24,6 +21,15 @@ public class PaymentController {
                         .responseMessage("Payment Made by User")
                         .responseObject(paymentService.getPaymentsMadeByUser(email))
                         .build());
+    }
+
+    @GetMapping("/made/card/{card_nickname}")
+    public ResponseEntity<ApiResponse> getPaymentsMadeByUserAndCard(@PathVariable("card_nickname") String nickname,
+                                                                    @RequestParam String email) throws EntityNotFound {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .responseMessage("Payment Made by User")
+                .responseObject(paymentService.getPaymentsMadeByUser(nickname, email))
+                .build());
     }
 
 }

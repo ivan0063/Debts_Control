@@ -1,6 +1,5 @@
 package com.jimm0063.magi.api.control.deudas.repository;
 
-import com.jimm0063.magi.api.control.deudas.entity.Card;
 import com.jimm0063.magi.api.control.deudas.entity.Debt;
 import com.jimm0063.magi.api.control.deudas.entity.User;
 import com.jimm0063.magi.api.control.deudas.entity.UserCard;

@@ -17,5 +17,7 @@ public interface PaymentRepository extends CrudRepository<Payment, Integer> {
 
     List<Payment> findAllByUserCardAndActiveIsTrue(UserCard userCard);
 
+    List<Payment> findAllByUserCardAndActiveIsTrueOrderByPaymentDateDesc(UserCard userCard);
+
     Optional<Payment> findFirstByPaymentDateIsLessThanAndUserCardAndActiveIsTrue(Timestamp today, UserCard userCard);
 }

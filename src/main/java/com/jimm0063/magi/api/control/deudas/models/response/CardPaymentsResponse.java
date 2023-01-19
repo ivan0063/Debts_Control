@@ -9,8 +9,8 @@ import java.util.List;
 
 @Builder
 @Setter @Getter
-public class UserPaymentResponse {
-    private String nickname;
-    private Integer cutOffDay;
-    private List<LocalDateTime> paymentsMade;
+public class CardPaymentsResponse {
+    private String cardBank;
+    private LocalDateTime lastPaymentMade;
+    private List<LocalDateTime> payments;
 }

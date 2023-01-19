@@ -8,6 +8,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DateUtils {
+    public static String outputFormatDate(LocalDate date) {
+        // Formatter for the output
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("MMM uuuu");
+        return date.format(outputFormatter);
+    }
+
     public static List<String> getDateList(LocalDate startDate, LocalDate endDate) {
         // Formatter for the input
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("M/d/u");

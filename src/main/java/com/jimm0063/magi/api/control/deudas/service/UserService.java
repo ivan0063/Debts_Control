@@ -1,6 +1,9 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
-import com.jimm0063.magi.api.control.deudas.entity.*;
+import com.jimm0063.magi.api.control.deudas.entity.CapitalUser;
+import com.jimm0063.magi.api.control.deudas.entity.Debt;
+import com.jimm0063.magi.api.control.deudas.entity.User;
+import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
 import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;

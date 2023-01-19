@@ -1,19 +1,17 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jimm0063.magi.api.control.deudas.entity.Payment;
+import com.jimm0063.magi.api.control.deudas.entity.UserCard;
+import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
+import com.jimm0063.magi.api.control.deudas.models.response.CardPaymentsResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.UserPaymentResponse;
 import com.jimm0063.magi.api.control.deudas.repository.PaymentRepository;
 import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
-import org.springdoc.webmvc.core.SpringWebMvcProvider;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,5 +41,22 @@ public class PaymentService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    public CardPaymentsResponse getPaymentsMadeByUser(String cardNickname, String email) throws EntityNotFound {
+        UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(cardNickname, email)
+                .orElseThrow(EntityNotFound::new);
+
+        List<LocalDateTime> payments = paymentRepository.findAllByUserCardAndActiveIsTrueOrderByPaymentDateDesc(userCard)
+                .stream()
+                .map(Payment::getPaymentDate)
+                .map(Timestamp::toLocalDateTime)
+                .collect(Collectors.toList());
+
+        return CardPaymentsResponse.builder()
+                .cardBank(userCard.getNickname())
+                .payments(payments)
+                .lastPaymentMade(payments.size() > 0 ? payments.get(0) : null)
+                .build();
     }
 }
