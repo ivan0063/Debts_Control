@@ -1,6 +1,7 @@
 package com.jimm0063.magi.api.control.deudas.controller;
 
 import com.jimm0063.magi.api.control.deudas.models.request.BankProjectionReq;
+import com.jimm0063.magi.api.control.deudas.models.request.CardProjectionReq;
 import com.jimm0063.magi.api.control.deudas.models.request.ProjectionRequest;
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.ProjectionResponse;
@@ -35,6 +36,18 @@ public class ProjectionController {
     @PostMapping("/all/debts")
     public ResponseEntity<ApiResponse> projectionByAllDebts(@RequestBody ProjectionRequest projectionRequest) {
         ProjectionResponse projectionByBank = projectionService.allDebtProjectionByDate(projectionRequest.getEmail(), projectionRequest.getProjectionUntil());
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .responseMessage("All Debt Projection")
+                .responseObject(projectionByBank)
+                .build()
+        );
+    }
+
+    @PostMapping("/card")
+    public ResponseEntity<ApiResponse> projectionByAllCard(@RequestBody CardProjectionReq projectionRequest) {
+        ProjectionResponse projectionByBank = projectionService
+                .cardProjection(projectionRequest.getEmail(), projectionRequest.getCard(), projectionRequest.getProjectionUntil());
 
         return ResponseEntity.ok(ApiResponse.builder()
                 .responseMessage("All Debt Projection")

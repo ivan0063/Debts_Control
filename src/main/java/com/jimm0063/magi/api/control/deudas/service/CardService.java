@@ -12,9 +12,8 @@ import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
 import com.jimm0063.magi.api.control.deudas.utils.ModelBuilder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,8 +48,10 @@ public class CardService {
         debtRepository.saveAll(updatedDebts);
 
         Payment payment = new Payment();
-        payment.setPaymentDate(Timestamp.valueOf(LocalDateTime.now()));
+        payment.setPaymentDate(LocalDate.now());
         payment.setUserCard(userCard);
+        payment.setMonthPaymentMade(Month.from(LocalDate.now()).toString());
+        payment.setActive(true);
         paymentRepository.save(payment);
 
         return updatedDebts.stream()
@@ -75,7 +76,7 @@ public class CardService {
         debtRepository.saveAll(updatedDebts);
 
         Payment payment = paymentRepository
-                .findFirstByPaymentDateIsLessThanAndUserCardAndActiveIsTrue(Timestamp.valueOf(LocalDateTime.now()), userCard)
+                .findFirstByPaymentDateIsLessThanAndUserCardAndActiveIsTrue(LocalDate.now(), userCard)
                 .orElseThrow(EntityNotFound::new);
         payment.setActive(false);
         paymentRepository.save(payment);

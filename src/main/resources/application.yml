@@ -2,7 +2,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        default_schema: deudas_prod
+        default_schema: deudas
     database: POSTGRESQL
     show-sql: true
     hibernate:

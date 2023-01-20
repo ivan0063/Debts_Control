@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -12,5 +12,5 @@ import java.util.List;
 public class UserPaymentResponse {
     private String nickname;
     private Integer cutOffDay;
-    private List<LocalDateTime> paymentsMade;
+    private List<LocalDate> paymentsMade;
 }

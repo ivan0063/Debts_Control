@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
 @Setter @Getter
 public class CardPaymentsResponse {
     private String cardBank;
-    private LocalDateTime lastPaymentMade;
-    private List<LocalDateTime> payments;
+    private LocalDate lastPaymentMade;
+    private List<LocalDate> payments;
 }

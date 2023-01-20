@@ -9,8 +9,7 @@ import com.jimm0063.magi.api.control.deudas.repository.PaymentRepository;
 import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +27,9 @@ public class PaymentService {
         return userCardRepository.findAllByUser_EmailAndActiveIsTrue(email)
                 .stream()
                 .map(userCard -> {
-                    List<LocalDateTime> paymentsMade = paymentRepository.findAllByUserCardAndActiveIsTrue(userCard)
+                    List<LocalDate> paymentsMade = paymentRepository.findAllByUserCardAndActiveIsTrue(userCard)
                             .stream()
                             .map(Payment::getPaymentDate)
-                            .map(Timestamp::toLocalDateTime)
                             .collect(Collectors.toList());
 
                     return UserPaymentResponse.builder()
@@ -47,10 +45,9 @@ public class PaymentService {
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(cardNickname, email)
                 .orElseThrow(EntityNotFound::new);
 
-        List<LocalDateTime> payments = paymentRepository.findAllByUserCardAndActiveIsTrueOrderByPaymentDateDesc(userCard)
+        List<LocalDate> payments = paymentRepository.findAllByUserCardAndActiveIsTrueOrderByPaymentDateDesc(userCard)
                 .stream()
                 .map(Payment::getPaymentDate)
-                .map(Timestamp::toLocalDateTime)
                 .collect(Collectors.toList());
 
         return CardPaymentsResponse.builder()

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pago")
@@ -16,7 +16,10 @@ public class Payment {
     private Integer idPayment;
 
     @Column (name = "fecha_pago")
-    private Timestamp paymentDate;
+    private LocalDate paymentDate;
+
+    @Column (name = "mes_pagado")
+    private String monthPaymentMade;
 
     @Column (name = "activo")
     private Boolean active;

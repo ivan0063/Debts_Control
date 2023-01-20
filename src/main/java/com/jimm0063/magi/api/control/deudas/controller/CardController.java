@@ -32,7 +32,7 @@ public class CardController {
         return ResponseEntity.ok(
                 ApiResponse.builder()
                         .responseMessage("The Card payment has been applied")
-                        .responseObject(cardService.doCardPayment(cardNickname, email))
+                        .responseObject(cardService.undonePayment(cardNickname, email))
                         .build()
         );
     }
