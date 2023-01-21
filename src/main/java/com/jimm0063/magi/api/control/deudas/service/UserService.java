@@ -7,6 +7,7 @@ import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
 import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
+import com.jimm0063.magi.api.control.deudas.models.response.UserCardResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.UserFinancialStatusResponse;
 import com.jimm0063.magi.api.control.deudas.repository.CapitalUserRepository;
 import com.jimm0063.magi.api.control.deudas.repository.DebtRepository;
@@ -46,7 +47,7 @@ public class UserService {
                 .build();
     }
 
-    public Object financialStatus(String email) throws EntityNotFound {
+    public UserFinancialStatusResponse financialStatus(String email) throws EntityNotFound {
         UserFinancialStatusResponse.UserFinancialStatusResponseBuilder userFinancialStatusResponseBuilder = UserFinancialStatusResponse.builder();
 
         User user = userRepository.findFristByEmail(email)
@@ -100,5 +101,17 @@ public class UserService {
         userFinancialStatusResponseBuilder.debtSpecification(userDebtSpecification);
 
         return userFinancialStatusResponseBuilder.build();
+    }
+
+    public Object getCardsByUser(String email) {
+        return userCardRepository.findAllByUser_EmailAndActiveIsTrue(email)
+                .stream()
+                .map(userCard -> UserCardResponse.builder()
+                        .bankName(userCard.getCard().getBank().getBankName())
+                        .cardName(userCard.getCard().getCardName())
+                        .cutOffDay(userCard.getCutOffDay())
+                        .nickname(userCard.getNickname())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

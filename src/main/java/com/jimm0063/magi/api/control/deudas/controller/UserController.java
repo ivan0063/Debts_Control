@@ -27,4 +27,12 @@ public class UserController {
                 .responseMessage("User Financial Status")
                 .build();
     }
+
+    @GetMapping("/cards")
+    public ApiResponse getCardsByUser(@RequestParam String email) {
+        return ApiResponse.builder()
+                .responseObject(userService.getCardsByUser(email))
+                .responseMessage("Cards by user")
+                .build();
+    }
 }
