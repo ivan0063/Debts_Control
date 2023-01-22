@@ -9,6 +9,7 @@ import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestM
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.UserCardResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.UserFinancialStatusResponse;
+import com.jimm0063.magi.api.control.deudas.models.response.UserResponse;
 import com.jimm0063.magi.api.control.deudas.repository.CapitalUserRepository;
 import com.jimm0063.magi.api.control.deudas.repository.DebtRepository;
 import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
@@ -113,5 +114,16 @@ public class UserService {
                         .nickname(userCard.getNickname())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public UserResponse validateUser(String email) throws EntityNotFound {
+        return userRepository.findFristByEmail(email)
+                .map(user -> UserResponse.builder()
+                            .lastName(user.getLastName())
+                            .name(user.getName())
+                            .email(user.getEmail())
+                            .build()
+                )
+                .orElseThrow(EntityNotFound::new);
     }
 }
