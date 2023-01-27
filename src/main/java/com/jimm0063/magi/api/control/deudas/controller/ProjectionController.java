@@ -47,13 +47,13 @@ public class ProjectionController {
                 .cardProjection(projectionRequest.getEmail(), projectionRequest.getCard(), projectionRequest.getProjectionUntil());
 
         return ResponseEntity.ok(ApiResponse.builder()
-                .responseMessage("All Debt Projection")
+                .responseMessage("Projection by Card")
                 .responseObject(projectionByBank)
                 .build()
         );
     }
 
-    @PostMapping("/financial/status")
+    @PostMapping("/savings")
     public ResponseEntity<ApiResponse> getFinancialProjection(@RequestBody ProjectionRequest projectionRequest) {
 
         return ResponseEntity.ok(ApiResponse.builder()
