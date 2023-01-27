@@ -7,10 +7,7 @@ import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.ProjectionResponse;
 import com.jimm0063.magi.api.control.deudas.service.ProjectionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/projection")
@@ -52,6 +49,16 @@ public class ProjectionController {
         return ResponseEntity.ok(ApiResponse.builder()
                 .responseMessage("All Debt Projection")
                 .responseObject(projectionByBank)
+                .build()
+        );
+    }
+
+    @PostMapping("/financial/status")
+    public ResponseEntity<ApiResponse> getFinancialProjection(@RequestBody ProjectionRequest projectionRequest) {
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .responseMessage("Savings projection")
+                .responseObject(projectionService.financialProjection(projectionRequest))
                 .build()
         );
     }

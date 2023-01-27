@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface UserFixedExpsenseRepository extends CrudRepository<UserFixedExpsense, Integer> {
     List<UserFixedExpsense> findAllByUserAndFixedExpense_TypeAndActiveIsTrue(User u, String type);
+
+    List<UserFixedExpsense> findAllByUserAndActiveIsTrue(User u);
 }
