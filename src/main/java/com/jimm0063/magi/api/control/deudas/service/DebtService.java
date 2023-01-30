@@ -76,9 +76,6 @@ public class DebtService {
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(multiDebtReq.getCardNickname(), multiDebtReq.getEmail())
                 .orElseThrow(EntityNotFound::new);
 
-        Card card = userCard.getCard();
-        User user = userCard.getUser();
-
         multiDebtReq.getDebtData().forEach(debtModel -> {
             // identify tht type of the current installment
             Integer currentInstallment = debtModel.getMonthlyInstallment();

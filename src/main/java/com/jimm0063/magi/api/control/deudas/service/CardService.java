@@ -35,7 +35,8 @@ public class CardService {
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(cardNickname, email)
                 .orElseThrow(EntityNotFound::new);
 
-        List<Debt> updatedDebts = debtRepository.findAllByUserCardAndActive(userCard, true).stream()
+        List<Debt> updatedDebts = debtRepository.findAllByUserCardAndActive(userCard, true)
+                .stream()
                 .peek(debt -> {
                     Integer currentInstallment = debt.getCurrentInstallment();
                     debt.setCurrentInstallment(currentInstallment + 1);

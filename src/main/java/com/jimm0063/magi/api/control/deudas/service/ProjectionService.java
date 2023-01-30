@@ -10,6 +10,7 @@ import com.jimm0063.magi.api.control.deudas.repository.*;
 import com.jimm0063.magi.api.control.deudas.utils.DateUtils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class ProjectionService {
     private final UserCardRepository userCardRepository;
     private final UserRepository userRepository;
@@ -133,35 +135,36 @@ public class ProjectionService {
                                 .stream()
                                 .mapToDouble(UserFixedExpsense::getAmount)
                                 .sum();
-        AtomicReference<Double> savingUpdated = new AtomicReference<>(savings.getAmount());
 
-        List<Map<String, Object>> monthRows = DateUtils.getDateList(LocalDate.now(), projectionRequest.getProjectionUntil())
+        AtomicReference<Double> savingUpdated = new AtomicReference<>(savings.getAmount());
+        AtomicReference<Integer> index = new AtomicReference<>(0);
+
+        List<Map<String, Object>> monthRows = DateUtils.getDateMap(LocalDate.now(), projectionRequest.getProjectionUntil())
                 .stream()
-                .map(month -> {
-                    Double monthDebtPayment = debtRepository.findAllByUserCard_UserAndActive(user, true)
+                .map(monthData -> {
+                    Integer indx =index.updateAndGet(indexValue -> indexValue + 1);
+                    double monthlyDebtPayment = debtRepository.findAllByUserCard_UserAndActive(user, true)
                             .stream()
                             .mapToDouble(debt -> {
                                 double amountPaid = debt.getAmountPaid();
-                                // Look for the payments made on that month
+                                // Look for the payments made on that monthData
                                 LocalDate preset = LocalDate.now();
                                 List<Payment> paymentsMadeThisMonth = paymentRepository
                                         .paymentsMadeThisMonth(preset.getMonth().getValue(), preset.getYear(), debt.getUserCard());
-                                if(paymentsMadeThisMonth.isEmpty()) amountPaid += debt.getMonthlyPayment();
 
-                                return (amountPaid <= debt.getTotalAmount()) ? amountPaid : 0;
+                                if(paymentsMadeThisMonth.isEmpty()) amountPaid = amountPaid + (indx * debt.getMonthlyPayment());
+
+                                return (amountPaid <= debt.getTotalAmount()) ? debt.getMonthlyPayment() : 0;
                             })
                             .sum();
-                    Double extraMonthSaving = salary.getAmount() - fixedMonthlyPayment;
+                    Double extraMonthSaving = (salary.getAmount() - fixedMonthlyPayment) - monthlyDebtPayment;
                     savingUpdated.updateAndGet(saving -> saving + extraMonthSaving);
 
-                    Map<String, Object> monthFinancialStatus = new HashMap<>();
-                    monthFinancialStatus.put("monthDebtPayment", monthDebtPayment);
-                    monthFinancialStatus.put("extraMonthSaving", extraMonthSaving);
-                    monthFinancialStatus.put("savingsTotal", savingUpdated.get());
-
                     Map<String, Object> monthRow = new HashMap<>();
-                    monthRow.put("month", month);
-                    monthRow.put("monthFinancialStatus", monthFinancialStatus);
+                    monthRow.put("monthlyDebtPayment", monthlyDebtPayment);
+                    monthRow.put("extraMonthSaving", extraMonthSaving);
+                    monthRow.put("savingsTotal", savingUpdated.get());
+                    monthRow.put("month", monthData.get("dateFormatted"));
 
                     return monthRow;
                 })
