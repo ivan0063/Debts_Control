@@ -1,9 +1,6 @@
 package com.jimm0063.magi.api.control.deudas.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,14 +12,19 @@ import java.sql.Timestamp;
 public class UpdateSavings {
     @Id
     @Column(name = "id_actualizacion_ahorros")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer updateSavvingsId;
 
     @Column(name = "nuevo_valor_ahorro")
-    private String newSavingsValue;
+    private Double newSavingsValue;
 
     @Column(name = "antiguo_valor_ahorros")
-    private String lastSavingValue;
+    private Double lastSavingValue;
 
     @Column(name = "fecha_actualizacion")
     private Timestamp updateDate;
+
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name = "id_usuario")
+    private User user;
 }

@@ -1,21 +1,14 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
-import com.jimm0063.magi.api.control.deudas.entity.CapitalUser;
-import com.jimm0063.magi.api.control.deudas.entity.Debt;
-import com.jimm0063.magi.api.control.deudas.entity.User;
-import com.jimm0063.magi.api.control.deudas.entity.UserCard;
+import com.jimm0063.magi.api.control.deudas.entity.*;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
 import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestModel;
-import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
-import com.jimm0063.magi.api.control.deudas.models.response.UserCardResponse;
-import com.jimm0063.magi.api.control.deudas.models.response.UserFinancialStatusResponse;
-import com.jimm0063.magi.api.control.deudas.models.response.UserResponse;
-import com.jimm0063.magi.api.control.deudas.repository.CapitalUserRepository;
-import com.jimm0063.magi.api.control.deudas.repository.DebtRepository;
-import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
-import com.jimm0063.magi.api.control.deudas.repository.UserRepository;
+import com.jimm0063.magi.api.control.deudas.models.response.*;
+import com.jimm0063.magi.api.control.deudas.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,20 +21,32 @@ public class UserService {
     private final UserCardRepository userCardRepository;
     private final DebtRepository debtRepository;
     private final UserRepository userRepository;
+    private final UpdateSavingsRepository updateSavingsRepository;
 
-    public UserService(CapitalUserRepository capitalUserRepository, UserCardRepository userCardRepository, DebtRepository debtRepository, UserRepository userRepository) {
+    public UserService(CapitalUserRepository capitalUserRepository, UserCardRepository userCardRepository,
+                       DebtRepository debtRepository, UserRepository userRepository,
+                       UpdateSavingsRepository updateSavingsRepository) {
         this.capitalUserRepository = capitalUserRepository;
         this.userCardRepository = userCardRepository;
         this.debtRepository = debtRepository;
         this.userRepository = userRepository;
+        this.updateSavingsRepository = updateSavingsRepository;
     }
 
     public ApiResponse updateUserSavings(SavingsUpdateRequestModel savingsUpdateRequestModel) throws EntityNotFound {
         CapitalUser capitalUser = capitalUserRepository.findByUser_EmailAndCapital_CapitalName(savingsUpdateRequestModel.getEmail(), "Ahorro")
                 .orElseThrow(EntityNotFound::new);
 
+        UpdateSavings updateSavings = new UpdateSavings();
+        updateSavings.setUpdateDate(Timestamp.valueOf(LocalDateTime.now()));
+        updateSavings.setNewSavingsValue(savingsUpdateRequestModel.getSavingsAmountUpdate());
+        updateSavings.setLastSavingValue(capitalUser.getAmount());
+        updateSavings.setUser(capitalUser.getUser());
+
         capitalUser.setAmount(savingsUpdateRequestModel.getSavingsAmountUpdate());
+
         capitalUserRepository.save(capitalUser);
+        updateSavingsRepository.save(updateSavings);
 
         return ApiResponse.builder()
                 .responseMessage("Savings for user has been saved")
@@ -125,5 +130,17 @@ public class UserService {
                             .build()
                 )
                 .orElseThrow(EntityNotFound::new);
+    }
+
+    public List<UpdateSavingsResponse> getSavingsUpdatedByUser(String email) {
+        return updateSavingsRepository.findAllByUser_Email(email)
+                .stream()
+                .map(updateSavings -> UpdateSavingsResponse.builder()
+                        .lastSavingValue(updateSavings.getLastSavingValue())
+                        .newSavingsValue(updateSavings.getNewSavingsValue())
+                        .updateDate(updateSavings.getUpdateDate().toLocalDateTime())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 }

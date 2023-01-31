@@ -44,4 +44,12 @@ public class UserController {
                 .responseMessage("Cards by user")
                 .build();
     }
+
+    @GetMapping("/savings/updated/values")
+    public ApiResponse getUpdatedSavingValues(@RequestParam String email) {
+        return ApiResponse.builder()
+                .responseObject(userService.getSavingsUpdatedByUser(email))
+                .responseMessage("Cards by user")
+                .build();
+    }
 }
