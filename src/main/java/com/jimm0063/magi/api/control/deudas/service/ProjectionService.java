@@ -139,7 +139,9 @@ public class ProjectionService {
         AtomicReference<Double> savingUpdated = new AtomicReference<>(savings.getAmount());
         AtomicReference<Integer> index = new AtomicReference<>(0);
 
-        List<Map<String, Object>> monthRows = DateUtils.getDateMap(LocalDate.now(), projectionRequest.getProjectionUntil())
+        LocalDate startDate = (LocalDate.now().getDayOfMonth() >= 15) ? LocalDate.now().plusMonths(1) : LocalDate.now();
+
+        List<Map<String, Object>> monthRows = DateUtils.getDateMap(startDate, projectionRequest.getProjectionUntil())
                 .stream()
                 .map(monthData -> {
                     Integer indx =index.updateAndGet(indexValue -> indexValue + 1);
