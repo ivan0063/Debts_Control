@@ -21,6 +21,9 @@ public class UpdateSavings {
     @Column(name = "antiguo_valor_ahorros")
     private Double lastSavingValue;
 
+    @Column(name = "descripcion")
+    private String description;
+
     @Column(name = "fecha_actualizacion")
     private Timestamp updateDate;
 

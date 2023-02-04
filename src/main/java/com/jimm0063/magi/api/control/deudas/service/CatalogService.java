@@ -1,6 +1,5 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
-import com.jimm0063.magi.api.control.deudas.entity.FixedExpense;
 import com.jimm0063.magi.api.control.deudas.models.response.FixedExpenseResponse;
 import com.jimm0063.magi.api.control.deudas.repository.UserFixedExpenseRepository;
 import org.springframework.stereotype.Service;

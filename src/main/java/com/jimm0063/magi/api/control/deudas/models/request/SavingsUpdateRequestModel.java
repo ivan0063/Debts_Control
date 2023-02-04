@@ -7,4 +7,5 @@ import lombok.Setter;
 public class SavingsUpdateRequestModel {
     private String email;
     private Double savingsAmountUpdate;
+    private String description;
 }

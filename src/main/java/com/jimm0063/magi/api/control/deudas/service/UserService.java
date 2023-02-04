@@ -41,6 +41,7 @@ public class UserService {
         updateSavings.setUpdateDate(Timestamp.valueOf(LocalDateTime.now()));
         updateSavings.setNewSavingsValue(savingsUpdateRequestModel.getSavingsAmountUpdate());
         updateSavings.setLastSavingValue(capitalUser.getAmount());
+        updateSavings.setDescription(savingsUpdateRequestModel.getDescription());
         updateSavings.setUser(capitalUser.getUser());
 
         capitalUser.setAmount(savingsUpdateRequestModel.getSavingsAmountUpdate());

@@ -168,7 +168,11 @@ public class DebtService {
                 .responseObject(
                         debtRepository.findAllByUserCard_UserAndActive(user, false)
                                 .stream()
-                                .map(ModelBuilder::buildDebtModelResponse)
+                                .map(debt -> {
+                                    DebtModelResponse debtModelResponse = ModelBuilder.buildDebtModelResponse(debt);
+                                    debtModelResponse.setCardNickname(debt.getUserCard().getNickname());
+                                    return debtModelResponse;
+                                })
                                 .collect(Collectors.toList())
                 )
                 .build();

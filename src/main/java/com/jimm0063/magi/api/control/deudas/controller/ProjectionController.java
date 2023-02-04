@@ -7,7 +7,10 @@ import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.ProjectionResponse;
 import com.jimm0063.magi.api.control.deudas.service.ProjectionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projection")
