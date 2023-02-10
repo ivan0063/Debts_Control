@@ -2,6 +2,7 @@ package com.jimm0063.magi.api.control.deudas.service;
 
 import com.jimm0063.magi.api.control.deudas.entity.*;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
+import com.jimm0063.magi.api.control.deudas.models.request.SalaryUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.response.*;
 import com.jimm0063.magi.api.control.deudas.repository.*;
@@ -22,15 +23,17 @@ public class UserService {
     private final DebtRepository debtRepository;
     private final UserRepository userRepository;
     private final UpdateSavingsRepository updateSavingsRepository;
+    private final UpdateSalaryRepository updateSalaryRepository;
 
     public UserService(CapitalUserRepository capitalUserRepository, UserCardRepository userCardRepository,
                        DebtRepository debtRepository, UserRepository userRepository,
-                       UpdateSavingsRepository updateSavingsRepository) {
+                       UpdateSavingsRepository updateSavingsRepository, UpdateSalaryRepository updateSalaryRepository) {
         this.capitalUserRepository = capitalUserRepository;
         this.userCardRepository = userCardRepository;
         this.debtRepository = debtRepository;
         this.userRepository = userRepository;
         this.updateSavingsRepository = updateSavingsRepository;
+        this.updateSalaryRepository = updateSalaryRepository;
     }
 
     public ApiResponse updateUserSavings(SavingsUpdateRequestModel savingsUpdateRequestModel) throws EntityNotFound {
@@ -48,6 +51,27 @@ public class UserService {
 
         capitalUserRepository.save(capitalUser);
         updateSavingsRepository.save(updateSavings);
+
+        return ApiResponse.builder()
+                .responseMessage("Savings for user has been saved")
+                .build();
+    }
+
+    public ApiResponse updateUserSavings(SalaryUpdateRequestModel salaryUpdateRequestModel) throws EntityNotFound {
+        CapitalUser capitalUser = capitalUserRepository.findByUser_EmailAndCapital_CapitalName(salaryUpdateRequestModel.getEmail(), "Sueldo")
+                .orElseThrow(EntityNotFound::new);
+
+        UpdateSalary updateSalary = new UpdateSalary();
+        updateSalary.setUpdateDate(Timestamp.valueOf(LocalDateTime.now()));
+        updateSalary.setNewSalaryValue(salaryUpdateRequestModel.getSalaryAmountUpdate());
+        updateSalary.setLastSalaryValue(capitalUser.getAmount());
+        updateSalary.setDescription(salaryUpdateRequestModel.getDescription());
+        updateSalary.setUser(capitalUser.getUser());
+
+        capitalUser.setAmount(salaryUpdateRequestModel.getSalaryAmountUpdate());
+
+        capitalUserRepository.save(capitalUser);
+        updateSalaryRepository.save(updateSalary);
 
         return ApiResponse.builder()
                 .responseMessage("Savings for user has been saved")
@@ -140,6 +164,18 @@ public class UserService {
                         .lastSavingValue(updateSavings.getLastSavingValue())
                         .newSavingsValue(updateSavings.getNewSavingsValue())
                         .updateDate(updateSavings.getUpdateDate().toLocalDateTime())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    public List<UpdateSalaryResponse> getSalaryUpdatedByUser(String email) {
+        return updateSalaryRepository.findAllByUser_Email(email)
+                .stream()
+                .map(updateSalary -> UpdateSalaryResponse.builder()
+                        .lastSalaryValue(updateSalary.getLastSalaryValue())
+                        .newSalaryValue(updateSalary.getNewSalaryValue())
+                        .updateDate(updateSalary.getUpdateDate().toLocalDateTime())
                         .build()
                 )
                 .collect(Collectors.toList());

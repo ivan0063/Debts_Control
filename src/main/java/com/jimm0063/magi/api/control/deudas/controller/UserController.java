@@ -1,6 +1,7 @@
 package com.jimm0063.magi.api.control.deudas.controller;
 
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
+import com.jimm0063.magi.api.control.deudas.models.request.SalaryUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.request.SavingsUpdateRequestModel;
 import com.jimm0063.magi.api.control.deudas.models.response.ApiResponse;
 import com.jimm0063.magi.api.control.deudas.service.UserService;
@@ -28,6 +29,11 @@ public class UserController {
         return userService.updateUserSavings(savingsUpdateRequestModel);
     }
 
+    @PostMapping("/update/salary")
+    public ApiResponse updateSavings(@RequestBody SalaryUpdateRequestModel salaryUpdateRequestModel) throws EntityNotFound {
+        return userService.updateUserSavings(salaryUpdateRequestModel);
+    }
+
     @GetMapping("/financial/status")
     public ApiResponse getUserFinancialStatus(@RequestParam String email) throws EntityNotFound {
         return ApiResponse.builder()
@@ -51,4 +57,13 @@ public class UserController {
                 .responseMessage("Cards by user")
                 .build();
     }
+
+    @GetMapping("/salary/updated/values")
+    public ApiResponse getUpdatedSalaryValues(@RequestParam String email) {
+        return ApiResponse.builder()
+                .responseObject(userService.getSalaryUpdatedByUser(email))
+                .responseMessage("Cards by user")
+                .build();
+    }
+
 }
