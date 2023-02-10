@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -178,13 +180,23 @@ public class DebtService {
                 .build();
     }
 
-    public List<DebtModelResponse> findAllByCard(String email, String nickname) throws EntityNotFound {
+    public Map<String, Object> findAllByCard(String email, String nickname) throws EntityNotFound {
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(nickname, email)
                 .orElseThrow(EntityNotFound::new);
 
-        return debtRepository.findAllByUserCardAndActive(userCard, true)
+        List<DebtModelResponse> debtsByCard = debtRepository.findAllByUserCardAndActive(userCard, true)
                 .stream()
                 .map(ModelBuilder::buildDebtModelResponse)
                 .collect(Collectors.toList());
+
+        Double monthlyPayment = debtsByCard.parallelStream().mapToDouble(DebtModelResponse::getMonthlyPayment).sum();
+        Double total = debtsByCard.parallelStream().mapToDouble(DebtModelResponse::getTotalAmount).sum();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("debts", debtsByCard);
+        response.put("total", total);
+        response.put("monthlyPayment", monthlyPayment);
+
+        return response;
     }
 }

@@ -24,7 +24,7 @@ public class UserFixedExpsense {
     private Double amount;
 
     @Column(name = "dia_pago")
-    private Integer paymentDate;
+    private Integer paymentDay;
 
     @Column(name = "activo")
     private Boolean active;

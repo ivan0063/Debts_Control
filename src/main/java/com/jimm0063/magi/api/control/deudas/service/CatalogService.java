@@ -22,7 +22,7 @@ public class CatalogService {
                             .expenseName(userFixedExpense.getFixedExpense().getExpenseName())
                             .company(userFixedExpense.getFixedExpense().getCompany())
                             .amount(userFixedExpense.getAmount())
-                            .paymentDate(userFixedExpense.getPaymentDate())
+                            .paymentDate(userFixedExpense.getPaymentDay())
                             .build()
                 )
                 .collect(Collectors.toList());

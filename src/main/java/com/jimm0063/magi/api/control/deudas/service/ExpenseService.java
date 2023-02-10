@@ -9,6 +9,7 @@ import com.jimm0063.magi.api.control.deudas.repository.UserFixedExpsenseReposito
 import com.jimm0063.magi.api.control.deudas.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class ExpenseService {
                     Map<String, Object> streaming = new HashMap<>();
 
                     streaming.put("serviceName", userFixedExpense.getFixedExpense().getExpenseName());
-                    streaming.put("payDay", userFixedExpense.getPaymentDate());
+                    streaming.put("payDay", userFixedExpense.getPaymentDay());
                     streaming.put("monthlyAmount", userFixedExpense.getAmount());
 
                     return streaming;
@@ -57,5 +58,35 @@ public class ExpenseService {
                                 .build()
                 )
                 .build();
+    }
+
+    public Map<String, Object> getNextFixedExpensesByUser(String email) {
+        Integer payDay = (LocalDate.now().getDayOfMonth() <= 15) ? 15 : 30;
+        List<UserFixedExpsense> userFixedExpsenses = userFixedExpsenseRepository
+                .findAllByUser_EmailAndPaymentDayIsLessThanEqualAndActiveIsTrue(email, payDay);
+
+        List<Map<String, Object>> listNextFixedExpenses = userFixedExpsenses
+                .parallelStream()
+                .map(userFixedExpsense -> {
+                    Map<String, Object> streaming = new HashMap<>();
+
+                    streaming.put("serviceName", userFixedExpsense.getFixedExpense().getExpenseName());
+                    streaming.put("payDay", userFixedExpsense.getPaymentDay());
+                    streaming.put("monthlyAmount", userFixedExpsense.getAmount());
+
+                    return streaming;
+                })
+                .collect(Collectors.toList());
+
+        Double totalFixedExpensePayment = userFixedExpsenses.parallelStream()
+                .mapToDouble(UserFixedExpsense::getAmount)
+                .sum();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("nextFixedExpenses", listNextFixedExpenses);
+        response.put("total", totalFixedExpensePayment);
+
+
+        return response;
     }
 }
