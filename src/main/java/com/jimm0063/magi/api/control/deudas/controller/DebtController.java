@@ -45,4 +45,13 @@ public class DebtController {
     public ResponseEntity<ApiResponse> getAllFinisedByUser(@RequestParam String email ) throws EntityNotFound {
         return ResponseEntity.ok(debtService.findAllFinishedDebtsByUser(email));
     }
+
+    @GetMapping("/about/finish")
+    public ResponseEntity<ApiResponse> getAllAboutToFinish(@RequestParam String email ) throws EntityNotFound {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .responseMessage("Debts that end this month")
+                .responseObject(debtService.debtsAboutToFinish(email))
+                .build()
+        );
+    }
 }

@@ -199,4 +199,19 @@ public class DebtService {
 
         return response;
     }
+
+    public List<DebtModelResponse> debtsAboutToFinish(String email) throws EntityNotFound {
+        User user = userRepository.findFristByEmail(email)
+                        .orElseThrow(EntityNotFound::new);
+
+        LocalDate currentMonth = LocalDate.now();
+        LocalDate nextMonth = LocalDate.now().plusMonths(1);
+
+        return debtRepository.findAllByUserCard_UserAndActive(user, true)
+                .stream()
+                .filter(debt -> debt.getEndDate().getYear() == currentMonth.getYear())
+                .filter(debt -> debt.getEndDate().getMonth() == currentMonth.getMonth())
+                .map(ModelBuilder::buildDebtModelResponse)
+                .collect(Collectors.toList());
+    }
 }
