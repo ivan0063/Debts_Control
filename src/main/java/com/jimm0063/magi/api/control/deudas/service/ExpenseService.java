@@ -61,26 +61,45 @@ public class ExpenseService {
     }
 
     public Map<String, Object> getNextFixedExpensesByUser(String email) {
-        Integer payDay = (LocalDate.now().getDayOfMonth() <= 15) ? 15 : 30;
+        int payDay = (LocalDate.now().getDayOfMonth() <= 15) ? 15 : 30;
+
         List<UserFixedExpsense> userFixedExpsenses = userFixedExpsenseRepository
-                .findAllByUser_EmailAndPaymentDayIsLessThanEqualAndActiveIsTrue(email, payDay);
+                .findAllByUser_EmailAndPaymentDayIsLessThanEqualAndActiveIsTrue(email, payDay)
+                .stream()
+                .filter(userFixedExpsense -> !(userFixedExpsense.getFixedExpense().getType().equals("Streaming")))
+                .collect(Collectors.toList());
+
 
         List<Map<String, Object>> listNextFixedExpenses = userFixedExpsenses
                 .parallelStream()
                 .map(userFixedExpsense -> {
-                    Map<String, Object> streaming = new HashMap<>();
+                    Map<String, Object> expense = new HashMap<>();
 
-                    streaming.put("serviceName", userFixedExpsense.getFixedExpense().getExpenseName());
-                    streaming.put("payDay", userFixedExpsense.getPaymentDay());
-                    streaming.put("monthlyAmount", userFixedExpsense.getAmount());
+                    expense.put("serviceName", userFixedExpsense.getFixedExpense().getExpenseName());
+                    expense.put("payDay", userFixedExpsense.getPaymentDay());
+                    expense.put("monthlyAmount", userFixedExpsense.getAmount());
 
-                    return streaming;
+                    return expense;
                 })
                 .collect(Collectors.toList());
+
 
         Double totalFixedExpensePayment = userFixedExpsenses.parallelStream()
                 .mapToDouble(UserFixedExpsense::getAmount)
                 .sum();
+
+        if(payDay == 15) {
+            Double streamingCost = userFixedExpsenseRepository.findAllByUser_EmailAndFixedExpense_TypeAndActiveIsTrue(email, "Streaming")
+                    .stream()
+                    .mapToDouble(UserFixedExpsense::getAmount)
+                    .sum();
+
+            Map<String, Object> expense = new HashMap<>();
+            expense.put("serviceName", "Streaming Services");
+            expense.put("payDay", 15);
+            expense.put("monthlyAmount", streamingCost);
+            listNextFixedExpenses.add(expense);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("nextFixedExpenses", listNextFixedExpenses);
