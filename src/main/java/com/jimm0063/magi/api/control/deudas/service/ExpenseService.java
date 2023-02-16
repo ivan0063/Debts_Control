@@ -66,6 +66,10 @@ public class ExpenseService {
         List<UserFixedExpsense> userFixedExpsenses = userFixedExpsenseRepository
                 .findAllByUser_EmailAndPaymentDayIsLessThanEqualAndActiveIsTrue(email, payDay)
                 .stream()
+                .filter(userFixedExpsense -> payDay <= 15 ?
+                        userFixedExpsense.getPaymentDay() <= 15 :
+                        userFixedExpsense.getPaymentDay() > 15 && userFixedExpsense.getPaymentDay() <= 30
+                )
                 .filter(userFixedExpsense -> !(userFixedExpsense.getFixedExpense().getType().equals("Streaming")))
                 .collect(Collectors.toList());
 
