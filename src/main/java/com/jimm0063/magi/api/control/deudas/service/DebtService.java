@@ -1,6 +1,9 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
-import com.jimm0063.magi.api.control.deudas.entity.*;
+import com.jimm0063.magi.api.control.deudas.entity.BankUser;
+import com.jimm0063.magi.api.control.deudas.entity.Debt;
+import com.jimm0063.magi.api.control.deudas.entity.User;
+import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
 import com.jimm0063.magi.api.control.deudas.models.request.DebtReqModel;
 import com.jimm0063.magi.api.control.deudas.models.request.MultiDebtReq;
@@ -46,8 +49,6 @@ public class DebtService {
 
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(debtModel.getCardNickname(), debtModel.getUser())
                 .orElseThrow(EntityNotFound::new);
-        Card card = userCard.getCard();
-        User user = userCard.getUser();
 
         // Calculate the end date for the debt
         LocalDate endDate = debtModel.getInitDate().plusMonths(debtModel.getInstallments());

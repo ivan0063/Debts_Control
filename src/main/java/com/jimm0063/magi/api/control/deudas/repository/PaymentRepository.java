@@ -23,4 +23,6 @@ public interface PaymentRepository extends CrudRepository<Payment, Integer> {
 
     @Query("FROM Payment p WHERE MONTH(p.paymentDate) = :month AND YEAR(p.paymentDate) = :year AND p.userCard = :userCard")
     List<Payment> paymentsMadeThisMonth(@Param("month") Integer month, @Param("year") Integer year, @Param("userCard") UserCard userCard);
+
+    boolean existsPaymentByMonthPaymentMadeAndUserCard_NicknameAndActiveIsTrue(String currentMonth, String nickname);
 }

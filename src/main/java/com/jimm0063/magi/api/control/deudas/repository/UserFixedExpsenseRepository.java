@@ -15,5 +15,7 @@ public interface UserFixedExpsenseRepository extends CrudRepository<UserFixedExp
 
     List<UserFixedExpsense> findAllByUserAndActiveIsTrue(User u);
 
+    List<UserFixedExpsense> findAllByUser_EmailAndActiveIsTrue(String email);
+
     List<UserFixedExpsense> findAllByUser_EmailAndPaymentDayIsLessThanEqualAndActiveIsTrue(String email, Integer payDay);
 }

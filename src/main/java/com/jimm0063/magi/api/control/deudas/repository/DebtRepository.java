@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -16,8 +15,6 @@ public interface DebtRepository extends CrudRepository<Debt, Integer> {
     List<Debt> findAllByUserCardAndActive(UserCard user, Boolean active);
 
     List<Debt> findAllByUserCard_UserAndActive(User user, Boolean active);
-
-    List<Debt> findAllByUserCard_UserAndEndDateAndActiveIsTrue(User u, LocalDate localDate);
 
     Integer countAllByUserCard_UserAndActiveIsTrue(User user);
 }
