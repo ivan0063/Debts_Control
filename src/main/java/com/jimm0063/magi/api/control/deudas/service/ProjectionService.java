@@ -3,6 +3,7 @@ package com.jimm0063.magi.api.control.deudas.service;
 import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.entity.UserFixedExpsense;
 import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthProjection;
+import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthStatus;
 import com.jimm0063.magi.api.control.deudas.models.request.ProjectionRequest;
 import com.jimm0063.magi.api.control.deudas.models.response.projection.BankProjection;
 import com.jimm0063.magi.api.control.deudas.models.response.projection.CardProjection;
@@ -23,21 +24,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProjectionService {
     private final UserCardRepository userCardRepository;
-    private final UserRepository userRepository;
-    private final DebtRepository debtRepository;
-    private final PaymentRepository paymentRepository;
     private final CapitalUserRepository capitalUserRepository;
     private final UserFixedExpsenseRepository userFixedExpsenseRepository;
     private final CardService cardService;
 
-    public ProjectionService(UserCardRepository userCardRepository, UserRepository userRepository,
-                             DebtRepository debtRepository, PaymentRepository paymentRepository,
+    public ProjectionService(UserCardRepository userCardRepository,
                              CapitalUserRepository capitalUserRepository,
-                             UserFixedExpsenseRepository userFixedExpsenseRepository, CardService cardService) {
+                             UserFixedExpsenseRepository userFixedExpsenseRepository,
+                             CardService cardService) {
         this.userCardRepository = userCardRepository;
-        this.userRepository = userRepository;
-        this.debtRepository = debtRepository;
-        this.paymentRepository = paymentRepository;
         this.capitalUserRepository = capitalUserRepository;
         this.userFixedExpsenseRepository = userFixedExpsenseRepository;
         this.cardService = cardService;
@@ -92,19 +87,28 @@ public class ProjectionService {
                 .forEach(userCard -> cardService.calculateDebtProjectionByCard(userCard, projectionRequest.getProjectionUntil())
                             .forEach(monthDebtProjection -> {
                                 ProjectionResponse projectionResponse = projection.get(monthDebtProjection.getMonth());
-                                if (projectionResponse == null) {
+                                if (projectionResponse == null)
                                     projectionResponse = ProjectionResponse.builder()
-                                            .monthlyDebtPayment(monthDebtProjection.getMonthTotal())
+                                            .monthlyDebtPayment(0.0)
                                             .extraMonthSaving(0.0)
                                             .savingsTotal(0.0)
-                                            .debts(new ArrayList<>())
+                                            //.debts(new ArrayList<>())
+                                            .debts(new LinkedHashMap<>())
                                             .build();
-                                } else {
-                                    double monthlyDebtPayment = projectionResponse.getMonthlyDebtPayment() + monthDebtProjection.getMonthTotal();
-                                    projectionResponse.setMonthlyDebtPayment(monthlyDebtPayment);
-                                    projectionResponse.getDebts().addAll(monthDebtProjection.getDebtsMonthStatus());
-                                }
 
+                                //projectionResponse.getDebts().addAll(monthDebtProjection.getDebtsMonthStatus());
+                                Map<String, Double> debtsTotals = projectionResponse.getDebts();
+                                monthDebtProjection.getDebtsMonthStatus()
+                                        .forEach(debtMonthStatus -> {
+                                            Double currentTotal = debtsTotals.get(debtMonthStatus.getBankName());
+                                            if (currentTotal == null) currentTotal = 0.0;
+
+                                            double updatedTotal = currentTotal + debtMonthStatus.getCurrentMonthPayment();
+                                            debtsTotals.put(debtMonthStatus.getBankName(), updatedTotal);
+                                        });
+
+                                double monthlyDebtPayment = projectionResponse.getMonthlyDebtPayment() + monthDebtProjection.getMonthTotal();
+                                projectionResponse.setMonthlyDebtPayment(monthlyDebtPayment);
                                 projection.put(monthDebtProjection.getMonth(), projectionResponse);
                             })
                 );

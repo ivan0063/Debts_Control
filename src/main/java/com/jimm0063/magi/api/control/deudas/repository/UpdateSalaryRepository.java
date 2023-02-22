@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@Transactional
 public interface UpdateSalaryRepository extends CrudRepository<UpdateSalary, Integer> {
     List<UpdateSalary> findAllByUser_Email(String email);
 }

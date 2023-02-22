@@ -9,5 +9,7 @@ import lombok.Setter;
 public class DebtMonthStatus {
     private String debtName;
     private String currentMonth;
+    private String bankName;
+    private String cardName;
     private Double currentMonthPayment;
 }

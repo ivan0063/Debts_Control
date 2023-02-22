@@ -94,7 +94,7 @@ public class UserService {
             List<Debt> debtsByBank = debtRepository.findAllByUserCardAndActive(userCard, true);
             for (Debt bankDebt : debtsByBank) {
                 bankMonthlyDebt += bankDebt.getMonthlyPayment();
-                bankTotalDebt += bankDebt.getTotalAmount() - (bankDebt.getCurrentInstallment() * bankDebt.getMonthlyPayment());
+                bankTotalDebt += bankDebt.getAmountPaid();
             }
             bankDebtSpecification.put("card_nick_name", userCard.getNickname());
             bankDebtSpecification.put("monthly_payment", bankMonthlyDebt);

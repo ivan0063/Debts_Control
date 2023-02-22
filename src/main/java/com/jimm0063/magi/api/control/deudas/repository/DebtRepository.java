@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@Transactional
 public interface DebtRepository extends CrudRepository<Debt, Integer> {
     List<Debt> findAllByUserCardAndActive(UserCard user, Boolean active);
 

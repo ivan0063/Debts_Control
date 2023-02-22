@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
 public interface PaymentRepository extends CrudRepository<Payment, Integer> {
     List<Payment> findAllByUserCardAndActiveIsTrue(UserCard userCard);
 

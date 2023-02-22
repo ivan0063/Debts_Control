@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
 public interface CapitalUserRepository extends CrudRepository<CapitalUser, Integer> {
     Optional<CapitalUser> findByUser_EmailAndCapital_CapitalName(String email, String capitalName);
 

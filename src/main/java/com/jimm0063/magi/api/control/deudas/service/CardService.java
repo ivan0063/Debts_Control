@@ -118,19 +118,19 @@ public class CardService {
         // Getting the debts
         List<Debt> debtsByCard = debtRepository.findAllByUserCardAndActive(userCard, true);
 
-        // Calculating the dates
-        debtsByCard.removeAll(debtsByCard.stream()
-                .filter(debt ->
-                        debt.getEndDate().getMonth() == LocalDate.now().getMonth() &&
-                                debt.getEndDate().getYear() == LocalDate.now().getYear())
-                .collect(Collectors.toList()));
-
         debtsByCard = debtsByCard.stream()
                 .peek(debt -> {
                     boolean existPayment = paymentRepository.existsPaymentByMonthPaymentMadeAndUserCard_NicknameAndActiveIsTrue(LocalDate.now().getMonth().toString(), debt.getUserCard().getNickname());
                     if(!existPayment) debt.setCurrentInstallment(debt.getCurrentInstallment() + 1);
                 })
                 .collect(Collectors.toList());
+
+        // Calculating the dates
+        debtsByCard.removeAll(debtsByCard.stream()
+                .filter(debt ->
+                        debt.getEndDate().getMonth() == LocalDate.now().getMonth() &&
+                                debt.getEndDate().getYear() == LocalDate.now().getYear())
+                .collect(Collectors.toList()));
 
         // Calculating projection
         List<String> months = DateUtils.getDateList(LocalDate.now().plusMonths(1), until);
@@ -143,8 +143,7 @@ public class CardService {
                         Double monthlyPayment = debt.getMonthlyPayment();
                         int currentInstallment = debt.getCurrentInstallment() + monthIncrement.get();
 
-                        if(currentInstallment > debt.getInstallments())
-                            monthlyPayment = 0.0;
+                        if(currentInstallment > debt.getInstallments()) monthlyPayment = 0.0;
 
                         String currentMonth = currentInstallment +  "/" + debt.getInstallments();
 
@@ -152,6 +151,8 @@ public class CardService {
                                 .currentMonthPayment(monthlyPayment)
                                 .debtName(debt.getDebtName())
                                 .currentMonth(currentMonth)
+                                .cardName(debt.getUserCard().getCard().getCardName())
+                                .bankName(debt.getUserCard().getCard().getBank().getBankName())
                                 .build();
                     })
                     .filter(debtMonthStatus -> debtMonthStatus.getCurrentMonthPayment() != 0)
