@@ -222,8 +222,7 @@ public class DebtService {
         User user = userRepository.findFristByEmail(email)
                         .orElseThrow(EntityNotFound::new);
 
-        //LocalDate currentMonth = LocalDate.now();
-        LocalDate currentMonth = LocalDate.now().plusMonths(1);
+        LocalDate currentMonth = LocalDate.now();
 
         return debtRepository.findAllByUserCard_UserAndActive(user, true)
                 .stream()
