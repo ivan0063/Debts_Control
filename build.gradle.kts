@@ -26,6 +26,7 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.apache.poi:poi:5.2.3")
+	implementation("org.modelmapper:modelmapper:3.1.1")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")

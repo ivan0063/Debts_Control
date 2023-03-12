@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pago")
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_pago")
-    private Integer idPayment;
+    @Column(name = "id_pago", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID idPayment;
 
     @Column (name = "fecha_pago")
     private LocalDate paymentDate;

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "deuda")
@@ -14,8 +15,8 @@ import java.time.LocalDate;
 public class Debt {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_deuda")
-    private Integer debtId;
+    @Column(name = "id_deuda", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID debtId;
 
     @Column(name = "monto_total")
     private Double totalAmount;
@@ -28,12 +29,6 @@ public class Debt {
 
     @Column(name = "fecha_fin")
     private LocalDate endDate;
-
-    @Column(name = "parcialidad_actual")
-    private Integer currentInstallment;
-
-    @Column(name = "monto_pagado")
-    private Double amountPaid;
 
     @Column(name = "nombre_deuda")
     private String debtName;

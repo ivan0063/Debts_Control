@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "capital_usuario")
 @Setter @Getter
 public class CapitalUser {
     @Id
-    @Column(name = "id_usr_capital")
-    private Double idUsrCapital;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usr_capital", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID idUsrCapital;
 
     @Column(name = "monto")
     private Double amount;

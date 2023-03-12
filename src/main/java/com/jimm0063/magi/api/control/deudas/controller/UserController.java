@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/financial/status")
-    public ApiResponse getUserFinancialStatus(@RequestParam String email) throws EntityNotFound {
+    public ApiResponse getUserFinancialStatus(@RequestParam String email) throws Exception {
         return ApiResponse.builder()
                 .responseObject(userService.financialStatus(email))
                 .responseMessage("User Financial Status")

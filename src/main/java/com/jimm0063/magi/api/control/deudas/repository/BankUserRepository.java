@@ -6,8 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface BankUserRepository extends CrudRepository<BankUser, Integer> {
+public interface BankUserRepository extends CrudRepository<BankUser, UUID> {
     List<BankUser> findAllByUserAndActiveIsTrue(User user);
 }

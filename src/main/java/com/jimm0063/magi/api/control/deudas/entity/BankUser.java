@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "banco_usuario")
 @Setter @Getter
 public class BankUser {
     @Id
-    @Column(name = "id_usr_bank")
-    private Integer idUserCard;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usr_bank", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID idUserCard;
 
     @Column(name = "activo")
     private Boolean active;

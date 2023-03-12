@@ -6,9 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface UserFixedExpsenseRepository extends CrudRepository<UserFixedExpsense, Integer> {
+public interface UserFixedExpsenseRepository extends CrudRepository<UserFixedExpsense, UUID> {
     List<UserFixedExpsense> findAllByUserAndFixedExpense_TypeAndActiveIsTrue(User u, String type);
 
     List<UserFixedExpsense> findAllByUser_EmailAndFixedExpense_TypeAndActiveIsTrue(String email, String type);

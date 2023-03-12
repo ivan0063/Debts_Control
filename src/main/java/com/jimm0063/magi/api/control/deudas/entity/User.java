@@ -1,19 +1,19 @@
 package com.jimm0063.magi.api.control.deudas.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "usuario")
 @Setter @Getter
 public class User {
     @Id
-    @Column(name = "id_usuario")
-    private Integer userId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usuario", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID userId;
 
     @Column(name = "nombre")
     private String name;

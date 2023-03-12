@@ -3,19 +3,23 @@ package com.jimm0063.magi.api.control.deudas.service;
 import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.entity.UserFixedExpsense;
 import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthProjection;
-import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthStatus;
 import com.jimm0063.magi.api.control.deudas.models.request.ProjectionRequest;
 import com.jimm0063.magi.api.control.deudas.models.response.projection.BankProjection;
 import com.jimm0063.magi.api.control.deudas.models.response.projection.CardProjection;
 import com.jimm0063.magi.api.control.deudas.models.response.projection.ProjectionResponse;
-import com.jimm0063.magi.api.control.deudas.repository.*;
+import com.jimm0063.magi.api.control.deudas.repository.CapitalUserRepository;
+import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
+import com.jimm0063.magi.api.control.deudas.repository.UserFixedExpsenseRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 

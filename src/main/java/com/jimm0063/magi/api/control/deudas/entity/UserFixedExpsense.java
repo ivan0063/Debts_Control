@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "usuario_gasto_fijo")
 @Setter @Getter
 public class UserFixedExpsense {
     @Id
-    @Column(name = "id_usr_expense")
-    private Integer idUsrExpense;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usr_expense", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID idUsrExpense;
 
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "id_usuario")

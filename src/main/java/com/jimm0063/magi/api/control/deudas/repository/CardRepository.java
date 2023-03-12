@@ -6,9 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CardRepository extends CrudRepository<Card, Integer> {
+public interface CardRepository extends CrudRepository<Card, UUID> {
     Optional<Card> findFirstByCardName(String cardName);
 
     Optional<Card> findAllByBank(Bank bank);

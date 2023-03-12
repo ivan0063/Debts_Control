@@ -1,25 +1,32 @@
 package com.jimm0063.magi.api.control.deudas.service;
 
 import com.jimm0063.magi.api.control.deudas.entity.Debt;
+import com.jimm0063.magi.api.control.deudas.entity.DebtUpdate;
 import com.jimm0063.magi.api.control.deudas.entity.Payment;
 import com.jimm0063.magi.api.control.deudas.entity.UserCard;
 import com.jimm0063.magi.api.control.deudas.exception.EntityNotFound;
+import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtModel;
 import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthProjection;
 import com.jimm0063.magi.api.control.deudas.models.process.projection.DebtMonthStatus;
 import com.jimm0063.magi.api.control.deudas.models.response.DebtModelResponse;
 import com.jimm0063.magi.api.control.deudas.models.response.NextPaymentsResponse;
 import com.jimm0063.magi.api.control.deudas.repository.DebtRepository;
+import com.jimm0063.magi.api.control.deudas.repository.DebtUpdateRepository;
 import com.jimm0063.magi.api.control.deudas.repository.PaymentRepository;
 import com.jimm0063.magi.api.control.deudas.repository.UserCardRepository;
 import com.jimm0063.magi.api.control.deudas.utils.DateUtils;
 import com.jimm0063.magi.api.control.deudas.utils.ModelBuilder;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -29,28 +36,48 @@ public class CardService {
     private final UserCardRepository userCardRepository;
     private final DebtRepository debtRepository;
     private final PaymentRepository paymentRepository;
+    private final DebtUpdateRepository debtUpdateRepository;
+    private final ModelBuilder modelBuilder;
 
-    public CardService(UserCardRepository userCardRepository, DebtRepository debtRepository, PaymentRepository paymentRepository) {
+    public CardService(UserCardRepository userCardRepository, DebtRepository debtRepository,
+                       PaymentRepository paymentRepository, DebtUpdateRepository debtUpdateRepository,
+                        ModelBuilder modelBuilder) {
         this.userCardRepository = userCardRepository;
         this.debtRepository = debtRepository;
         this.paymentRepository = paymentRepository;
+        this.debtUpdateRepository = debtUpdateRepository;
+        this.modelBuilder = modelBuilder;
     }
 
     public List<DebtModelResponse> doCardPayment(String cardNickname, String email) throws EntityNotFound{
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(cardNickname, email)
                 .orElseThrow(EntityNotFound::new);
 
-        List<Debt> updatedDebts = debtRepository.findAllByUserCardAndActive(userCard, true)
+        List<Debt> debts = debtRepository.findAllByUserCardAndActive(userCard, true);
+
+        List<DebtUpdate> updatedDebts = debts
                 .stream()
-                .peek(debt -> {
-                    debt.setCurrentInstallment(debt.getCurrentInstallment() + 1);
-                    debt.setAmountPaid(debt.getAmountPaid() + debt.getMonthlyPayment());
-                    if(Objects.equals(debt.getCurrentInstallment(), debt.getInstallments()))
+                .map(debt -> {
+                    DebtUpdate debtUpdate = new DebtUpdate();
+                    debtUpdate.setUser(userCard.getUser());
+                    debtUpdate.setDebt(debt);
+                    debtUpdate.setInstallment(debtUpdate.getInstallment() + 1);
+                    debtUpdate.setAmountPaid(debtUpdate.getAmountPaid() + debt.getMonthlyPayment());
+                    debtUpdate.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+                    debtUpdate.setLastAmountPaid(debtUpdate.getAmountPaid());
+                    debtUpdate.setLastInstallment(debtUpdate.getInstallment());
+                    debtUpdate.setDescription("Payment Made");
+
+                    if(Objects.equals(debtUpdate.getInstallment(), debt.getInstallments()))
                         debt.setActive(false);
+
+                    debtUpdateRepository.save(debtUpdate);
+
+                    return debtUpdate;
                 })
                 .collect(Collectors.toList());
 
-        debtRepository.saveAll(updatedDebts);
+        debtUpdateRepository.saveAll(updatedDebts);
 
         Payment payment = new Payment();
         payment.setPaymentDate(LocalDate.now());
@@ -59,8 +86,8 @@ public class CardService {
         payment.setActive(true);
         paymentRepository.save(payment);
 
-        return updatedDebts.stream()
-                .map(ModelBuilder::buildDebtModelResponse)
+        return debts.stream()
+                .map(modelBuilder::buildDebtModelResponse)
                 .collect(Collectors.toList());
     }
 
@@ -70,11 +97,13 @@ public class CardService {
 
         List<Debt> updatedDebts = debtRepository.findAllByUserCardAndActive(userCard, true).stream()
                 .peek(debt -> {
-                    Integer currentInstallment = debt.getCurrentInstallment();
-                    debt.setCurrentInstallment(currentInstallment - 1);
-                    debt.setAmountPaid(debt.getAmountPaid() - debt.getMonthlyPayment());
-                    if(!debt.getActive())
-                        debt.setActive(true);
+                    Optional<DebtUpdate> debtUpdateOpt = debtUpdateRepository.findFirstByDebtAndActiveIsTrueOrderByTimestampDesc(debt);
+                    if(debtUpdateOpt.isPresent()) {
+                        DebtUpdate debtUpdate = debtUpdateOpt.get();
+                        debtUpdate.setActive(false);
+                        debtUpdateRepository.save(debtUpdate);
+                    }
+                    if(!debt.getActive()) debt.setActive(true);
                 })
                 .collect(Collectors.toList());
 
@@ -87,7 +116,7 @@ public class CardService {
         paymentRepository.save(payment);
 
         return updatedDebts.stream()
-                .map(ModelBuilder::buildDebtModelResponse)
+                .map(modelBuilder::buildDebtModelResponse)
                 .collect(Collectors.toList());
     }
 
@@ -115,8 +144,22 @@ public class CardService {
     }
 
     public List<DebtMonthProjection> calculateDebtProjectionByCard(UserCard userCard, LocalDate until) {
+        ModelMapper modelMapper = new ModelMapper();
         // Getting the debts
-        List<Debt> debtsByCard = debtRepository.findAllByUserCardAndActive(userCard, true);
+        List<DebtModel> debtsByCard = debtRepository.findAllByUserCardAndActive(userCard, true)
+                .stream()
+                .map(debt -> {
+                    DebtModel debtModel = modelMapper.map(debt, DebtModel.class);
+                    Optional<DebtUpdate> opt = debtUpdateRepository.findFirstByDebtAndActiveIsTrueOrderByTimestampDesc(debt);
+                    if(opt.isPresent()) {
+                        DebtUpdate debtUpdate = opt.get();
+                        debtModel.setCurrentInstallment(debtUpdate.getInstallment());
+                        debtModel.setAmountPaid(debtUpdate.getAmountPaid());
+                    }
+
+                    return debtModel;
+                })
+                .collect(Collectors.toList());
 
         debtsByCard = debtsByCard.stream()
                 .peek(debt -> {

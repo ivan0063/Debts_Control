@@ -24,16 +24,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final UpdateSavingsRepository updateSavingsRepository;
     private final UpdateSalaryRepository updateSalaryRepository;
+    private final DebtUpdateRepository debtUpdateRepository;
 
     public UserService(CapitalUserRepository capitalUserRepository, UserCardRepository userCardRepository,
                        DebtRepository debtRepository, UserRepository userRepository,
-                       UpdateSavingsRepository updateSavingsRepository, UpdateSalaryRepository updateSalaryRepository) {
+                       UpdateSavingsRepository updateSavingsRepository, UpdateSalaryRepository updateSalaryRepository,
+                       DebtUpdateRepository debtUpdateRepository) {
         this.capitalUserRepository = capitalUserRepository;
         this.userCardRepository = userCardRepository;
         this.debtRepository = debtRepository;
         this.userRepository = userRepository;
         this.updateSavingsRepository = updateSavingsRepository;
         this.updateSalaryRepository = updateSalaryRepository;
+        this.debtUpdateRepository = debtUpdateRepository;
     }
 
     public ApiResponse updateUserSavings(SavingsUpdateRequestModel savingsUpdateRequestModel) throws EntityNotFound {
@@ -78,7 +81,7 @@ public class UserService {
                 .build();
     }
 
-    public UserFinancialStatusResponse financialStatus(String email) throws EntityNotFound {
+    public UserFinancialStatusResponse financialStatus(String email) throws Exception {
         UserFinancialStatusResponse.UserFinancialStatusResponseBuilder userFinancialStatusResponseBuilder = UserFinancialStatusResponse.builder();
 
         User user = userRepository.findFristByEmail(email)
@@ -93,8 +96,10 @@ public class UserService {
             double bankTotalDebt = 0.0;
             List<Debt> debtsByBank = debtRepository.findAllByUserCardAndActive(userCard, true);
             for (Debt bankDebt : debtsByBank) {
+                DebtUpdate debtUpdate = debtUpdateRepository.findFirstByDebtAndActiveIsTrueOrderByTimestampDesc(bankDebt)
+                        .orElseThrow(Exception::new);
                 bankMonthlyDebt += bankDebt.getMonthlyPayment();
-                bankTotalDebt += bankDebt.getAmountPaid();
+                bankTotalDebt += debtUpdate.getAmountPaid();
             }
             bankDebtSpecification.put("card_nick_name", userCard.getNickname());
             bankDebtSpecification.put("monthly_payment", bankMonthlyDebt);

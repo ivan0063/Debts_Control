@@ -7,9 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserCardRepository extends CrudRepository<UserCard, Integer> {
+public interface UserCardRepository extends CrudRepository<UserCard, UUID> {
     List<UserCard> findAllByUserAndActiveIsTrue(User user);
 
     List<UserCard> findAllByUser_EmailAndActiveIsTrue(String email);

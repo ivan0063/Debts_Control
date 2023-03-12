@@ -5,8 +5,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CapitalRepository extends CrudRepository<Capital, Integer> {
+public interface CapitalRepository extends CrudRepository<Capital, UUID> {
     Optional<Capital> findByCapitalName(String capitalName);
 }

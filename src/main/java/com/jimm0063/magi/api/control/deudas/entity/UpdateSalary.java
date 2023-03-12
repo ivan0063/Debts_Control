@@ -5,15 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "actualizacion_salario")
 @Setter @Getter
 public class UpdateSalary {
     @Id
-    @Column(name = "id_actualizacion_salario")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer updateSalaryId;
+    @Column(name = "id_actualizacion_salario", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID updateSalaryId;
 
     @Column(name = "nuevo_valor_salario")
     private Double newSalaryValue;

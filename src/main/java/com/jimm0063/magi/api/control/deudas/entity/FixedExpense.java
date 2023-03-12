@@ -1,19 +1,19 @@
 package com.jimm0063.magi.api.control.deudas.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "gasto_fijo")
 @Setter @Getter
 public class FixedExpense {
     @Id
-    @Column(name = "id_gasto_fijo")
-    private Integer fixedExpendId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_gasto_fijo", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID fixedExpendId;
 
     @Column(name = "nombre_gasto")
     private String expenseName;

@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "usuario_tarjeta")
 @Setter @Getter
 public class UserCard {
     @Id
-    @Column(name = "id_usr_card")
-    private Integer idUserCard;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usr_card", nullable = false, columnDefinition = "UUID default uuid_generate_v4()")
+    private UUID idUserCard;
 
     @Column(name = "nickname")
     private String nickname;
