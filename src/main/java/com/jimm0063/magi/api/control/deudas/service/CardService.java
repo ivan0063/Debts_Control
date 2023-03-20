@@ -23,10 +23,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,7 @@ public class CardService {
         this.modelBuilder = modelBuilder;
     }
 
-    public List<DebtModelResponse> doCardPayment(String cardNickname, String email) throws EntityNotFound{
+    public List<DebtModelResponse> doCardPayment(String cardNickname, String email) throws EntityNotFound {
         UserCard userCard = userCardRepository.findByNicknameAndUser_EmailAndActiveIsTrue(cardNickname, email)
                 .orElseThrow(EntityNotFound::new);
 
@@ -58,23 +55,33 @@ public class CardService {
         List<DebtUpdate> updatedDebts = debts
                 .stream()
                 .map(debt -> {
-                    DebtUpdate debtUpdate = new DebtUpdate();
-                    debtUpdate.setUser(userCard.getUser());
-                    debtUpdate.setDebt(debt);
-                    debtUpdate.setInstallment(debtUpdate.getInstallment() + 1);
-                    debtUpdate.setAmountPaid(debtUpdate.getAmountPaid() + debt.getMonthlyPayment());
-                    debtUpdate.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
-                    debtUpdate.setLastAmountPaid(debtUpdate.getAmountPaid());
-                    debtUpdate.setLastInstallment(debtUpdate.getInstallment());
-                    debtUpdate.setDescription("Payment Made");
+                    Optional<DebtUpdate> optional = debtUpdateRepository.findFirstByDebtAndActiveIsTrueOrderByTimestampDesc(debt);
+                    DebtUpdate debtUpdate = null;
 
-                    if(Objects.equals(debtUpdate.getInstallment(), debt.getInstallments()))
-                        debt.setActive(false);
+                    if(optional.isPresent()) {
+                        DebtUpdate oldDebtUpdate = optional.get();
+                        oldDebtUpdate.setActive(false);
 
-                    debtUpdateRepository.save(debtUpdate);
+                        debtUpdate = new DebtUpdate();
+                        debtUpdate.setInstallment(oldDebtUpdate.getInstallment() + 1);
+                        debtUpdate.setAmountPaid(oldDebtUpdate.getAmountPaid() + debt.getMonthlyPayment());
+                        debtUpdate.setLastAmountPaid(oldDebtUpdate.getAmountPaid());
+                        debtUpdate.setLastInstallment(oldDebtUpdate.getInstallment());
+                        debtUpdate.setDebt(debt);
+                        debtUpdate.setUser(userCard.getUser());
+                        debtUpdate.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+                        debtUpdate.setDescription("Payment Made");
+                        debtUpdate.setActive(true);
+
+
+                        if(Objects.equals(debtUpdate.getInstallment(), debt.getInstallments())) debt.setActive(false);
+
+                        debtUpdateRepository.save(oldDebtUpdate);
+                    }
 
                     return debtUpdate;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         debtUpdateRepository.saveAll(updatedDebts);

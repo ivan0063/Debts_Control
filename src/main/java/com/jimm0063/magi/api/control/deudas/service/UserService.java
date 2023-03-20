@@ -93,17 +93,19 @@ public class UserService {
         for(UserCard userCard : userCards) {
             Map<String, Object> bankDebtSpecification = new HashMap<>();
             double bankMonthlyDebt = 0.0;
+            double bankDebtAmountPaid = 0.0;
             double bankTotalDebt = 0.0;
             List<Debt> debtsByBank = debtRepository.findAllByUserCardAndActive(userCard, true);
             for (Debt bankDebt : debtsByBank) {
                 DebtUpdate debtUpdate = debtUpdateRepository.findFirstByDebtAndActiveIsTrueOrderByTimestampDesc(bankDebt)
                         .orElseThrow(Exception::new);
                 bankMonthlyDebt += bankDebt.getMonthlyPayment();
-                bankTotalDebt += debtUpdate.getAmountPaid();
+                bankDebtAmountPaid += debtUpdate.getAmountPaid();
+                bankTotalDebt += bankDebt.getTotalAmount();
             }
             bankDebtSpecification.put("card_nick_name", userCard.getNickname());
             bankDebtSpecification.put("monthly_payment", bankMonthlyDebt);
-            bankDebtSpecification.put("bank_total_debt", bankTotalDebt);
+            bankDebtSpecification.put("bank_total_debt", bankTotalDebt - bankDebtAmountPaid);
             userDebtSpecification.add(bankDebtSpecification);
         }
 
