@@ -54,7 +54,7 @@ public class UserController {
     public ApiResponse getUpdatedSavingValues(@RequestParam String email) {
         return ApiResponse.builder()
                 .responseObject(userService.getSavingsUpdatedByUser(email))
-                .responseMessage("Cards by user")
+                .responseMessage("Savings updates by user")
                 .build();
     }
 
@@ -62,7 +62,7 @@ public class UserController {
     public ApiResponse getUpdatedSalaryValues(@RequestParam String email) {
         return ApiResponse.builder()
                 .responseObject(userService.getSalaryUpdatedByUser(email))
-                .responseMessage("Cards by user")
+                .responseMessage("Salary updates by user")
                 .build();
     }
 

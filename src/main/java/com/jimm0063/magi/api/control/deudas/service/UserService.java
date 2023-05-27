@@ -165,7 +165,12 @@ public class UserService {
     }
 
     public List<UpdateSavingsResponse> getSavingsUpdatedByUser(String email) {
-        return updateSavingsRepository.findAllByUser_Email(email)
+        List<UpdateSavings> userSavings = updateSavingsRepository.findAllByUser_Email(email);
+
+        int size = userSavings.size();
+        if(size > 5) userSavings = userSavings.subList(size-5, size);
+
+        return  userSavings
                 .stream()
                 .map(updateSavings -> UpdateSavingsResponse.builder()
                         .lastSavingValue(updateSavings.getLastSavingValue())
@@ -177,7 +182,12 @@ public class UserService {
     }
 
     public List<UpdateSalaryResponse> getSalaryUpdatedByUser(String email) {
-        return updateSalaryRepository.findAllByUser_Email(email)
+        List<UpdateSalary> userSalary = updateSalaryRepository.findAllByUser_Email(email);
+
+        int size = userSalary.size();
+        if(size > 5) userSalary = userSalary.subList(size-5, size);
+
+        return  userSalary
                 .stream()
                 .map(updateSalary -> UpdateSalaryResponse.builder()
                         .lastSalaryValue(updateSalary.getLastSalaryValue())
