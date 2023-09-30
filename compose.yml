@@ -1,0 +1,8 @@
+version: '3'
+services:
+  homeassistant:
+    container_name: debts_control
+    image: "jimm0063.debts.control.backend:latest"
+    restart: unless-stopped
+    ports:
+      - '8081:8081'
