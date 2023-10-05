@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -226,9 +227,11 @@ public class DebtService {
 
         return debtRepository.findAllByUserCard_UserAndActive(user, true)
                 .stream()
-                .filter(debt -> debt.getEndDate().getYear() == currentMonth.getYear())
-                .filter(debt -> debt.getEndDate().getMonth() == currentMonth.getMonth())
-                .map(modelBuilder::buildDebtModelResponse)
+                .map(debtUpdateRepository::findFirstByDebtAndActiveIsTrueOrderByTimestampDesc)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(debtUpdate -> (debtUpdate.getInstallment() + 1) == debtUpdate.getDebt().getInstallments())
+                .map(debtUpdate -> modelBuilder.buildDebtModelResponse(debtUpdate.getDebt()))
                 .collect(Collectors.toList());
     }
 }

@@ -42,7 +42,7 @@ public class DebtController {
     }
 
     @GetMapping("/finished/all/user")
-    public ResponseEntity<ApiResponse> getAllFinisedByUser(@RequestParam String email ) throws EntityNotFound {
+    public ResponseEntity<ApiResponse> getAllFinishedByUser(@RequestParam String email ) throws EntityNotFound {
         return ResponseEntity.ok(debtService.findAllFinishedDebtsByUser(email));
     }
 
