@@ -138,7 +138,6 @@ public class UserService {
                         .mapToDouble(UserFixedExpsense::getAmount)
                         .sum();
 
-
         userFinancialStatusResponseBuilder.email(email);
         userFinancialStatusResponseBuilder.totalMonthlyDebtPayment(totalMonthlyDebtPayment);
         userFinancialStatusResponseBuilder.incomes(incomes);
