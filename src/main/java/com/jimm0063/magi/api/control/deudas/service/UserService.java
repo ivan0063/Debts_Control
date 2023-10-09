@@ -25,11 +25,12 @@ public class UserService {
     private final UpdateSavingsRepository updateSavingsRepository;
     private final UpdateSalaryRepository updateSalaryRepository;
     private final DebtUpdateRepository debtUpdateRepository;
+    private final UserFixedExpenseRepository userFixedExpenseRepository;
 
     public UserService(CapitalUserRepository capitalUserRepository, UserCardRepository userCardRepository,
                        DebtRepository debtRepository, UserRepository userRepository,
                        UpdateSavingsRepository updateSavingsRepository, UpdateSalaryRepository updateSalaryRepository,
-                       DebtUpdateRepository debtUpdateRepository) {
+                       DebtUpdateRepository debtUpdateRepository, UserFixedExpenseRepository userFixedExpenseRepository) {
         this.capitalUserRepository = capitalUserRepository;
         this.userCardRepository = userCardRepository;
         this.debtRepository = debtRepository;
@@ -37,6 +38,7 @@ public class UserService {
         this.updateSavingsRepository = updateSavingsRepository;
         this.updateSalaryRepository = updateSalaryRepository;
         this.debtUpdateRepository = debtUpdateRepository;
+        this.userFixedExpenseRepository = userFixedExpenseRepository;
     }
 
     public ApiResponse updateUserSavings(SavingsUpdateRequestModel savingsUpdateRequestModel) throws EntityNotFound {
@@ -131,11 +133,18 @@ public class UserService {
 
         Integer countDebts = debtRepository.countAllByUserCard_UserAndActiveIsTrue(user);
 
+        Double totalFixedExpenses = userFixedExpenseRepository.findAllByUser_EmailAndActiveIsTrue(user.getEmail())
+                        .stream()
+                        .mapToDouble(UserFixedExpsense::getAmount)
+                        .sum();
+
+
         userFinancialStatusResponseBuilder.email(email);
         userFinancialStatusResponseBuilder.totalMonthlyDebtPayment(totalMonthlyDebtPayment);
         userFinancialStatusResponseBuilder.incomes(incomes);
         userFinancialStatusResponseBuilder.totalDebt(totalDebt);
         userFinancialStatusResponseBuilder.debtCount(countDebts);
+        userFinancialStatusResponseBuilder.totalFixedExpenses(totalFixedExpenses);
         userFinancialStatusResponseBuilder.debtSpecification(userDebtSpecification);
 
         return userFinancialStatusResponseBuilder.build();

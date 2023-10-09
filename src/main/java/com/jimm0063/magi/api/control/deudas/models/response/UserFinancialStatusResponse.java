@@ -15,5 +15,6 @@ public class UserFinancialStatusResponse {
     private Double totalDebt;
     private Integer debtCount;
     private Object incomes;
+    private Double totalFixedExpenses;
     private List<Map> debtSpecification;
 }
